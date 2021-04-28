@@ -1,12 +1,15 @@
 import axios, { AxiosResponse } from 'axios';
 
 import { useState, useEffect } from 'react';
-export const getUsers = async (queryString: string): Promise<any> => {
+export const getUsers = async (
+  queryString: string,
+  page: number
+): Promise<any> => {
   try {
     const response: AxiosResponse = await axios.get(
       'https://api.github.com/search/users',
       {
-        params: { q: `${queryString} in:user` },
+        params: { q: `${queryString} in:user`, per_page: 10, page },
       }
     );
     return response.data.items;
