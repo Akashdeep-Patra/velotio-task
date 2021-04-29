@@ -41,10 +41,10 @@ const Card = (props: any) => {
     <div className={classes.Card}>
       <img alt='avatar' className={classes.Avatar} src={user.avatar_url} />
       <div className={classes.loginName}>
-        <Typography color='primary' variant='h5'>
+        <Typography color='primary' variant='h6'>
           PROFILE NAME:
         </Typography>
-        <Typography color='primary' variant='h5'>
+        <Typography color='primary' variant='subtitle1'>
           {user.login}
         </Typography>
       </div>

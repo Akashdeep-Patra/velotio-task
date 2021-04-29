@@ -8,13 +8,11 @@ import { store } from './redux/store';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { defaultTheme } from './theme';
 ReactDOM.render(
-  <React.StrictMode>
-    <ThemeProvider theme={defaultTheme}>
-      <Provider store={store}>
-        <App />
-      </Provider>
-    </ThemeProvider>
-  </React.StrictMode>,
+  <ThemeProvider theme={defaultTheme}>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </ThemeProvider>,
   document.getElementById('root')
 );
 
