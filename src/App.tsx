@@ -94,10 +94,10 @@ function App() {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleSubmit = (data: User) => {
-    setUsers((currentUsers: User[]) => [data, ...currentUsers]);
-    setOpen(false);
-  };
+  // const handleSubmit = (data: User) => {
+  //   setUsers((currentUsers: User[]) => [data, ...currentUsers]);
+  //   setOpen(false);
+  // };
   useEffect(
     () => {
       if (debouncedName) {
