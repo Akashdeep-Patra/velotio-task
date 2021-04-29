@@ -10,8 +10,8 @@ import Button from '@material-ui/core/Button';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Zoom from '@material-ui/core/Zoom';
-import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import { useFormik } from 'formik';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -76,13 +76,31 @@ function App() {
   const classes = useStyles();
   const debouncedName = useDebounce(name, 500);
   const [open, setOpen] = useState(false);
+  const formik = useFormik({
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+    },
+    validationSchema: SignupSchema,
+    onSubmit: (values, { resetForm }) => {
+      setOpen(false);
+      resetForm();
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
   const handleScroll = () => {
-    if (name) {
-      setPage((prev) => prev + 1);
+    if (debouncedName) {
+      setPage(page + 1);
       setIsSearching(true);
-      getUsers(name, page).then((data: User[]) => {
+      getUsers(debouncedName, page).then((data: User[]) => {
+        data.forEach((user: User) => {
+          if (!users.find((obj: User) => obj.login === user.login)) {
+            users.push(user);
+          }
+        });
+        setUsers([...users]);
         setIsSearching(false);
-        setUsers((prevUsers: User[]) => [...prevUsers, ...data]);
       });
     }
   };
@@ -143,52 +161,57 @@ function App() {
       >
         <Zoom in={open}>
           <div className={classes.paper}>
-            <Formik
-              initialValues={{
-                firstName: '',
-                lastName: '',
-                email: '',
-              }}
-              validationSchema={SignupSchema}
-              onSubmit={(values) => {
-                // same shape as initial values
-                console.log(values);
-              }}
-            >
-              {({ errors, touched }) => (
-                <Form className={classes.Form}>
-                  <div>
-                    <Field
-                      className={classes.formField}
-                      placeholder='firstname'
-                      name='firstName'
-                    />
-                    {errors.firstName && touched.firstName ? (
-                      <div>{errors.firstName}</div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <Field className={classes.formField} name='lastName' />
-                    {errors.lastName && touched.lastName ? (
-                      <div>{errors.lastName}</div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <Field
-                      className={classes.formField}
-                      name='email'
-                      type='email'
-                    />
-                    {errors.email && touched.email ? (
-                      <div>{errors.email}</div>
-                    ) : null}
-                  </div>
-                  <Button variant='outlined' color='primary' type='submit'>
-                    Submit
-                  </Button>
-                </Form>
-              )}
-            </Formik>
+            <form className={classes.Form} onSubmit={formik.handleSubmit}>
+              <TextField
+                fullWidth
+                className={classes.SearchBox}
+                variant='outlined'
+                id='firstName'
+                name='firstName'
+                label='First Name'
+                value={formik.values.firstName}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.firstName && Boolean(formik.errors.firstName)
+                }
+                helperText={formik.touched.firstName && formik.errors.firstName}
+              />
+              <TextField
+                fullWidth
+                className={classes.SearchBox}
+                variant='outlined'
+                id='lastName'
+                name='lastName'
+                label='Last Name'
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                error={
+                  formik.touched.lastName && Boolean(formik.errors.lastName)
+                }
+                helperText={formik.touched.lastName && formik.errors.lastName}
+              />
+              <TextField
+                fullWidth
+                className={classes.SearchBox}
+                variant='outlined'
+                id='email'
+                name='email'
+                label='Email'
+                type='email'
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
+              />
+              <Button
+                color='primary'
+                variant='outlined'
+                fullWidth
+                type='submit'
+              >
+                Submit
+              </Button>
+            </form>
           </div>
         </Zoom>
       </Modal>
