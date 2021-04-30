@@ -1,10 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
-
+import { User } from '../redux/users/User.type';
 import { useState, useEffect } from 'react';
 export const getUsers = async (
   queryString: string,
   page: number
-): Promise<any> => {
+): Promise<User[]> => {
   try {
     const response: AxiosResponse = await axios.get(
       'https://api.github.com/search/users',

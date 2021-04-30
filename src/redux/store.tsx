@@ -1,9 +1,9 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import thunk, { ThunkMiddleware } from 'redux-thunk';
 import userReducer from './users/reducer';
-import { UserActionTypes } from './users/User.type';
+import { UserActions } from './users/actions';
 import logger from 'redux-logger';
-const middleware: any[] = [thunk as ThunkMiddleware<AppState, UserActionTypes>];
+const middleware: any[] = [thunk as ThunkMiddleware<AppState, UserActions>];
 if (process.env.NODE_ENV === 'development') {
   middleware.push(logger);
 }

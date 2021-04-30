@@ -34,7 +34,11 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
   },
 }));
-const Card = (props: any) => {
+export interface CardProps {
+  user: User;
+  key: string;
+}
+const Card: React.FC<CardProps> = (props: CardProps): JSX.Element => {
   const user: User = props.user;
   const classes = useStyles();
   return (

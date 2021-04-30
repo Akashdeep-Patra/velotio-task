@@ -1,13 +1,14 @@
-import { ADD_USER, SET_USERS } from './actionTypes';
-import { User, UserActionTypes } from './User.type';
+import { UserMutation } from './actionTypes';
+import { User } from './User.type';
+import { UserActions } from './actions';
 const initialState: User[] = [];
 
-const UserReducer = (state = initialState, action: UserActionTypes) => {
+const UserReducer = (state = initialState, action: UserActions) => {
   switch (action.type) {
-    case SET_USERS:
-      return action.users;
-    case ADD_USER:
-      return [...state, action.user];
+    case UserMutation.SET_USERS:
+      return action.payload;
+    case UserMutation.ADD_USER:
+      return [...state, action.payload];
     default:
       return state;
   }

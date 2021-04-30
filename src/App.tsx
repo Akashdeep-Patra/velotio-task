@@ -5,14 +5,13 @@ import { User } from './redux/users/User.type';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import { Waypoint } from 'react-waypoint';
 import Button from '@material-ui/core/Button';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Zoom from '@material-ui/core/Zoom';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
-
+import { useInView } from 'react-intersection-observer';
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
     .min(2, 'Too Short!')
@@ -24,7 +23,16 @@ const SignupSchema = Yup.object().shape({
     .required('Required'),
   email: Yup.string().email('Invalid email').required('Required'),
 });
-
+interface MyFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+const initialFormValues: MyFormValues = {
+  firstName: '',
+  lastName: '',
+  email: '',
+};
 const useStyles = makeStyles((theme) => ({
   App: {
     display: 'flex',
@@ -68,7 +76,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function App() {
+const App: React.FC = () => {
   const [name, setName] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -76,12 +84,12 @@ function App() {
   const classes = useStyles();
   const debouncedName = useDebounce(name, 500);
   const [open, setOpen] = useState(false);
+  const [ref, inView] = useInView({
+    threshold: 0.5,
+  });
+
   const formik = useFormik({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-    },
+    initialValues: initialFormValues,
     validationSchema: SignupSchema,
     onSubmit: (values, { resetForm }) => {
       setOpen(false);
@@ -89,19 +97,22 @@ function App() {
       alert(JSON.stringify(values, null, 2));
     },
   });
-  const handleScroll = () => {
+  const handleScroll = async (): Promise<void> => {
     if (debouncedName) {
       setPage(page + 1);
       setIsSearching(true);
-      getUsers(debouncedName, page).then((data: User[]) => {
+      try {
+        const data: User[] = await getUsers(debouncedName, page);
         data.forEach((user: User) => {
           if (!users.find((obj: User) => obj.login === user.login)) {
             users.push(user);
           }
+          setUsers([...users]);
+          setIsSearching(false);
         });
-        setUsers([...users]);
+      } catch (error) {
         setIsSearching(false);
-      });
+      }
     }
   };
 
@@ -120,10 +131,17 @@ function App() {
     () => {
       if (debouncedName) {
         setIsSearching(true);
-        getUsers(debouncedName, 1).then((data: User[]) => {
-          setIsSearching(false);
-          setUsers(data);
-        });
+        const fetchUsers = async () => {
+          try {
+            const data: User[] = await getUsers(debouncedName, 1);
+            setIsSearching(false);
+            setUsers(data);
+          } catch (error) {
+            setIsSearching(false);
+            setUsers([]);
+          }
+        };
+        fetchUsers();
       } else {
         setUsers([]);
         setIsSearching(false);
@@ -131,6 +149,12 @@ function App() {
     },
     [debouncedName] // Only call effect if debounced search term changes
   );
+  useEffect(() => {
+    if (inView) {
+      handleScroll();
+    }
+  }, [inView]);
+  const renderUsers = (user: User) => <Card key={user.login} user={user} />;
 
   return (
     <div className={classes.App}>
@@ -216,15 +240,12 @@ function App() {
         </Zoom>
       </Modal>
       <React.Fragment>
-        {users &&
-          users.map((user: User, index: number) => (
-            <Card key={user.login} user={user} />
-          ))}
-        <Waypoint onEnter={handleScroll} />
+        {users && users.map(renderUsers)}
+        <div ref={ref} />
       </React.Fragment>
       {isSearching && <CircularProgress />}
     </div>
   );
-}
+};
 
 export default App;

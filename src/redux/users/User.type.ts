@@ -1,4 +1,3 @@
-import { ADD_USER, SET_USERS } from './actionTypes';
 export interface User {
   login: string;
   id: number;
@@ -20,12 +19,3 @@ export interface User {
   site_admin: boolean;
   score: number;
 }
-export interface SetUsersAction {
-  type: typeof SET_USERS;
-  users: User[];
-}
-export interface AddUserAction {
-  type: typeof ADD_USER;
-  user: User;
-}
-export type UserActionTypes = SetUsersAction | AddUserAction;
