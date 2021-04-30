@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   navWrapper: {
     display: 'flex',
     justifyContent: 'space-between',
-    width: '100%',
+    width: '95%',
     padding: '2%',
   },
   modal: {
