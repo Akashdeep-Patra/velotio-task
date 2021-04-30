@@ -153,6 +153,7 @@ const App: React.FC = () => {
     if (inView) {
       handleScroll();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
   const renderUsers = (user: User) => <Card key={user.login} user={user} />;
 
