@@ -1,6 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 import { User } from '../redux/users/User.type';
 import { useState, useEffect } from 'react';
+import { Notyf } from 'notyf';
+import 'notyf/notyf.min.css';
+
+export const notyf = new Notyf();
 export const getUsers = async (
   queryString: string,
   page: number
@@ -12,8 +16,11 @@ export const getUsers = async (
         params: { q: `${queryString} in:user`, per_page: 10, page },
       }
     );
+
     return response.data.items;
   } catch (error) {
+    console.log('message', error.message);
+    notyf.error(error.message);
     return [];
   }
 };
@@ -31,5 +38,9 @@ export function useDebounce<T>(value: T, delay?: number): T {
 
   return debouncedValue;
 }
+
+export const Toaster = (text: string, duration: number = 2000) => {
+  notyf.success(text);
+};
 
 export default useDebounce;

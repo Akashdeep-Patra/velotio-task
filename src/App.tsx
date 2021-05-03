@@ -6,33 +6,9 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Modal from '@material-ui/core/Modal';
-import Backdrop from '@material-ui/core/Backdrop';
-import Zoom from '@material-ui/core/Zoom';
-import * as Yup from 'yup';
-import { useFormik } from 'formik';
 import { useInView } from 'react-intersection-observer';
-const SignupSchema = Yup.object().shape({
-  firstName: Yup.string()
-    .min(2, 'Too Short!')
-    .max(50, 'Too Long!')
-    .required('Required'),
-  lastName: Yup.string()
-    .min(2, 'Too Short!')
-    .max(50, 'Too Long!')
-    .required('Required'),
-  email: Yup.string().email('Invalid email').required('Required'),
-});
-interface MyFormValues {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-const initialFormValues: MyFormValues = {
-  firstName: '',
-  lastName: '',
-  email: '',
-};
+import Form from './components/form';
+
 const useStyles = makeStyles((theme) => ({
   App: {
     display: 'flex',
@@ -54,25 +30,8 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  paper: {
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: '6px',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    height: '70%',
-    width: '70%',
-  },
-  Form: {
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-  },
-  formField: {
-    width: '100%',
-    borderRadius: '6px',
-    height: '30px',
-    border: `1px solid ${theme.palette.primary.light}`,
+  bottomDiv: {
+    height: '1%',
   },
 }));
 
@@ -88,15 +47,6 @@ const App: React.FC = () => {
     threshold: 0.5,
   });
 
-  const formik = useFormik({
-    initialValues: initialFormValues,
-    validationSchema: SignupSchema,
-    onSubmit: (values, { resetForm }) => {
-      setOpen(false);
-      resetForm();
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
   const handleScroll = async (): Promise<void> => {
     if (debouncedName) {
       setPage(page + 1);
@@ -123,10 +73,7 @@ const App: React.FC = () => {
   const handleClose = () => {
     setOpen(false);
   };
-  // const handleSubmit = (data: User) => {
-  //   setUsers((currentUsers: User[]) => [data, ...currentUsers]);
-  //   setOpen(false);
-  // };
+
   useEffect(
     () => {
       if (debouncedName) {
@@ -155,7 +102,8 @@ const App: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
-  const renderUsers = (user: User) => <Card key={user.login} user={user} />;
+  const renderUsers = (users: User[]) =>
+    users.map((user) => <Card key={user.login} user={user} />);
 
   return (
     <div className={classes.App}>
@@ -172,77 +120,12 @@ const App: React.FC = () => {
           Add User
         </Button>
       </div>
-      <Modal
-        aria-labelledby='transition-modal-title'
-        aria-describedby='transition-modal-description'
-        className={classes.modal}
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
-      >
-        <Zoom in={open}>
-          <div className={classes.paper}>
-            <form className={classes.Form} onSubmit={formik.handleSubmit}>
-              <TextField
-                fullWidth
-                className={classes.SearchBox}
-                variant='outlined'
-                id='firstName'
-                name='firstName'
-                label='First Name'
-                value={formik.values.firstName}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.firstName && Boolean(formik.errors.firstName)
-                }
-                helperText={formik.touched.firstName && formik.errors.firstName}
-              />
-              <TextField
-                fullWidth
-                className={classes.SearchBox}
-                variant='outlined'
-                id='lastName'
-                name='lastName'
-                label='Last Name'
-                value={formik.values.lastName}
-                onChange={formik.handleChange}
-                error={
-                  formik.touched.lastName && Boolean(formik.errors.lastName)
-                }
-                helperText={formik.touched.lastName && formik.errors.lastName}
-              />
-              <TextField
-                fullWidth
-                className={classes.SearchBox}
-                variant='outlined'
-                id='email'
-                name='email'
-                label='Email'
-                type='email'
-                value={formik.values.email}
-                onChange={formik.handleChange}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email}
-              />
-              <Button
-                color='primary'
-                variant='outlined'
-                fullWidth
-                type='submit'
-              >
-                Submit
-              </Button>
-            </form>
-          </div>
-        </Zoom>
-      </Modal>
+
+      <Form open={open} handleClose={handleClose} setOpen={setOpen} />
+
       <React.Fragment>
-        {users && users.map(renderUsers)}
-        <div ref={ref} />
+        {users && renderUsers(users)}
+        <div className={classes.bottomDiv} ref={ref} />
       </React.Fragment>
       {isSearching && <CircularProgress />}
     </div>
