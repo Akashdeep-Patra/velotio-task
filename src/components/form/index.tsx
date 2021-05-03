@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useState } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import TextField from '@material-ui/core/TextField';
@@ -7,6 +7,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Zoom from '@material-ui/core/Zoom';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const SignupSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -41,8 +43,8 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: '6px',
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3),
-    height: '70%',
     width: '70%',
+    height: '80%',
   },
   Form: {
     display: 'flex',
@@ -55,6 +57,7 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  note: {},
 }));
 
 interface FormProps {
@@ -65,13 +68,14 @@ interface FormProps {
 
 const Form: React.FC<FormProps> = ({ setOpen, open, handleClose }) => {
   const classes = useStyles();
+  const [note, setNote] = useState('');
   const formik = useFormik({
     initialValues: initialFormValues,
     validationSchema: SignupSchema,
     onSubmit: (values, { resetForm }) => {
       setOpen(false);
       resetForm();
-      alert(JSON.stringify(values, null, 2));
+      alert(JSON.stringify({ ...values, note }, null, 2));
     },
   });
 
@@ -129,6 +133,15 @@ const Form: React.FC<FormProps> = ({ setOpen, open, handleClose }) => {
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
+            />
+            <CKEditor
+              editor={ClassicEditor}
+              data={note}
+              className={classes.note}
+              onChange={(event: React.ChangeEvent, editor: any) => {
+                const data = editor.getData();
+                setNote(data);
+              }}
             />
             <Button color='primary' variant='outlined' fullWidth type='submit'>
               Submit
