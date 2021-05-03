@@ -1,3 +1,4 @@
+import Interweave from 'interweave';
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
@@ -143,6 +144,7 @@ const Form: React.FC<FormProps> = ({ setOpen, open, handleClose }) => {
                 setNote(data);
               }}
             />
+            <Interweave content={note} />
             <Button color='primary' variant='outlined' fullWidth type='submit'>
               Submit
             </Button>
