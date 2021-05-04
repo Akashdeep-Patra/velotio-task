@@ -1,8 +1,6 @@
 import { makeStyles } from '@material-ui/core/styles';
-import React from 'react';
-import { User } from '../../redux/users/User.type';
 import Typography from '@material-ui/core/Typography';
-
+import Gravatar from 'react-gravatar';
 const useStyles = makeStyles((theme) => ({
   Card: {
     display: 'flex',
@@ -37,19 +35,29 @@ const useStyles = makeStyles((theme) => ({
 export interface CardProps {
   user: User;
   key: string;
+  handleClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 const Card: React.FC<CardProps> = (props: CardProps): JSX.Element => {
   const user: User = props.user;
   const classes = useStyles();
   return (
-    <div className={classes.Card}>
-      <img alt='avatar' className={classes.Avatar} src={user.avatar_url} />
+    <div
+      onClick={props.handleClick ? props.handleClick : () => {}}
+      className={classes.Card}
+    >
+      <Gravatar
+        email={user.email}
+        size={100}
+        rating='pg'
+        default='monsterid'
+        className={classes.Avatar}
+      />
       <div className={classes.loginName}>
         <Typography color='primary' variant='h6'>
           PROFILE NAME:
         </Typography>
         <Typography color='primary' variant='subtitle1'>
-          {user.login}
+          {user.username}
         </Typography>
       </div>
     </div>

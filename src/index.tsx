@@ -7,12 +7,16 @@ import { Provider } from 'react-redux';
 import { store } from './redux/store';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { defaultTheme } from './theme';
+import { BrowserRouter } from 'react-router-dom';
+
 ReactDOM.render(
-  <ThemeProvider theme={defaultTheme}>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </ThemeProvider>,
+  <Provider store={store}>
+    <ThemeProvider theme={defaultTheme}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
+  </Provider>,
   document.getElementById('root')
 );
 
