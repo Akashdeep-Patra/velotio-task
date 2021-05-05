@@ -22,6 +22,8 @@ const App = () => {
   const setTodosState = (todos: NormalizedObjects<Todo>) => {
     dispatch(setTodos(todos));
   };
+
+  //function for normalizing the related data into a singular schema
   function normalizeData<T extends DataWithId>(
     data: T[]
   ): NormalizedObjects<T> {
