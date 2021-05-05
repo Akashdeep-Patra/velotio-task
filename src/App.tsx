@@ -7,6 +7,7 @@ import { setPosts } from './redux/posts/actions';
 import { setComments } from './redux/comments/actions';
 import { setTodos } from './redux/todos/actions';
 import { fetchUsers, fetchPosts, fetchComments, fetchTodos } from './utils';
+
 const App = () => {
   const dispatch = useDispatch();
   const setUsersState = (users: NormalizedObjects<User>) => {

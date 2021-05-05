@@ -11,6 +11,8 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import Form from '../components/form';
+import Button from '@material-ui/core/Button';
 
 const useStyles = makeStyles((theme) => ({
   home: {
@@ -41,6 +43,7 @@ const useStyles = makeStyles((theme) => ({
 const Home = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [tab, setTab] = useState('posts');
   const users = useSelector<AppState, User[]>((state) =>
@@ -55,6 +58,9 @@ const Home = () => {
   const todos = useSelector<AppState, Todo[]>((state) =>
     Object.values(state.todos.byId)
   );
+  const handleformClose = () => {
+    setFormOpen(false);
+  };
   const handleClick = (user: User) => {
     setSelectedUser(user);
     setOpen(true);
@@ -69,19 +75,33 @@ const Home = () => {
   const renderPosts = (posts: Post[]) =>
     posts
       .filter((post) => post.userId === selectedUser?.id)
-      .map((post) => <div>{post.title}</div>);
+      .map((post) => <div key={post.id}>{post.title}</div>);
   const renderComments = (comments: Comment[]) =>
-    comments.map((comment) => <div>{comment.name}</div>);
+    comments.map((comment) => <div key={comment.id}>{comment.name}</div>);
   const renderTodos = (todos: Todo[]) =>
     todos
       .filter((todo) => todo.userId === selectedUser?.id)
-      .map((todo) => <div>{todo.title}</div>);
+      .map((todo) => <div key={todo.id}>{todo.title}</div>);
 
   const handleClose = () => {
     setOpen(false);
   };
   return (
     <div className={classes.home}>
+      <Button
+        variant='outlined'
+        onClick={() => {
+          setFormOpen(true);
+        }}
+        color='primary'
+      >
+        Open Form
+      </Button>
+      <Form
+        open={formOpen}
+        handleClose={handleformClose}
+        setOpen={setFormOpen}
+      />
       <Modal
         aria-labelledby='transition-modal-title'
         aria-describedby='transition-modal-description'
