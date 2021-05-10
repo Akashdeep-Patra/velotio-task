@@ -172,7 +172,6 @@ const Home = () => {
         <Zoom in={open}>
           <form className={classes.paper}>
             <FormControl className={classes.radioBar} component='fieldset'>
-              <FormLabel component='legend'>TAB</FormLabel>
               <RadioGroup
                 row
                 aria-label='position'
