@@ -29,6 +29,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   paper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     backgroundColor: theme.palette.background.paper,
     borderRadius: '6px',
     boxShadow: theme.shadows[5],
@@ -43,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   tab: {
     border: '1px solid grey',
     borderRadius: '6px',
-    width: '100%',
+    width: '70%',
     margin: '1%',
     padding: '1%',
     '&:hover': {
@@ -103,13 +106,8 @@ const Home = () => {
     posts
       .filter((post) => post.userId === selectedUser?.id)
       .map((post) => (
-        <div key={post.id}>
-          <div
-            className={classes.tab}
-            onClick={(e) => handleAnchorClick(post, e)}
-          >
-            {post.title}
-          </div>
+        <div className={classes.tab} key={post.id}>
+          <div onClick={(e) => handleAnchorClick(post, e)}>{post.title}</div>
           {selectedPost?.id === post.id && (
             <Menu
               id='simple-menu'
