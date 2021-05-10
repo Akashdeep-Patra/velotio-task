@@ -13,6 +13,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Form from '../components/form';
 import Button from '@material-ui/core/Button';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const useStyles = makeStyles((theme) => ({
   home: {
@@ -38,6 +40,16 @@ const useStyles = makeStyles((theme) => ({
   radioBar: {
     display: 'flex',
   },
+  tab: {
+    border: '1px solid grey',
+    borderRadius: '6px',
+    width: '100%',
+    margin: '1%',
+    padding: '1%',
+    '&:hover': {
+      cursor: 'pointer',
+    },
+  },
 }));
 
 const Home = () => {
@@ -45,15 +57,29 @@ const Home = () => {
   const [open, setOpen] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [tab, setTab] = useState('posts');
-  const users = useSelector<AppState, User[]>((state) =>
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleAnchorClick = (
+    post: Post,
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    setSelectedPost(post);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleAnchorClose = () => {
+    setAnchorEl(null);
+  };
+  const users = useSelector<AppState, NormalizedUserObject[]>((state) =>
     Object.values(state.users.byId)
   );
-  const posts = useSelector<AppState, Post[]>((state) =>
+  const posts = useSelector<AppState, NormalizedPostObject[]>((state) =>
     Object.values(state.posts.byId)
   );
-  const comments = useSelector<AppState, Comment[]>((state) =>
-    Object.values(state.comments.byId)
+  const commentsById = useSelector<AppState, { [id: string]: Comment }>(
+    (state) => state.comments.byId
   );
   const todos = useSelector<AppState, Todo[]>((state) =>
     Object.values(state.todos.byId)
@@ -72,16 +98,47 @@ const Home = () => {
     users.map((user) => (
       <Card key={user.id} handleClick={() => handleClick(user)} user={user} />
     ));
-  const renderPosts = (posts: Post[]) =>
+
+  const renderPosts = (posts: NormalizedPostObject[]) =>
     posts
       .filter((post) => post.userId === selectedUser?.id)
-      .map((post) => <div key={post.id}>{post.title}</div>);
-  const renderComments = (comments: Comment[]) =>
-    comments.map((comment) => <div key={comment.id}>{comment.name}</div>);
+      .map((post) => (
+        <div key={post.id}>
+          <div
+            className={classes.tab}
+            onClick={(e) => handleAnchorClick(post, e)}
+          >
+            {post.title}
+          </div>
+          {selectedPost?.id === post.id && (
+            <Menu
+              id='simple-menu'
+              anchorEl={anchorEl}
+              keepMounted
+              open={Boolean(anchorEl)}
+              onClose={handleAnchorClose}
+            >
+              {renderComments(post)}
+            </Menu>
+          )}
+        </div>
+      ));
+
+  const renderComments = (post: NormalizedPostObject) =>
+    post.comments.map((commentId) => (
+      <MenuItem onClick={handleAnchorClose} key={commentId}>
+        {commentsById[commentId].name}
+      </MenuItem>
+    ));
+
   const renderTodos = (todos: Todo[]) =>
     todos
       .filter((todo) => todo.userId === selectedUser?.id)
-      .map((todo) => <div key={todo.id}>{todo.title}</div>);
+      .map((todo) => (
+        <div className={classes.tab} key={todo.id}>
+          {todo.title}
+        </div>
+      ));
 
   const handleClose = () => {
     setOpen(false);
@@ -131,11 +188,6 @@ const Home = () => {
                   label='Posts'
                 />
                 <FormControlLabel
-                  value='comments'
-                  control={<Radio />}
-                  label='Comments'
-                />
-                <FormControlLabel
                   value='todos'
                   control={<Radio />}
                   label='Todos'
@@ -144,10 +196,6 @@ const Home = () => {
             </FormControl>
             {selectedUser && open && tab === 'posts' && renderPosts(posts)}
             {selectedUser && open && tab === 'todos' && renderTodos(todos)}
-            {selectedUser &&
-              open &&
-              tab === 'comments' &&
-              renderComments(comments)}
           </form>
         </Zoom>
       </Modal>

@@ -1,6 +1,6 @@
 import { UserMutation } from './actionTypes';
 import { UserActions } from './actions';
-const initialState: NormalizedObjects<User> = {
+const initialState: NormalizedObjects<NormalizedUserObject> = {
   byId: {},
   allIds: [],
 };

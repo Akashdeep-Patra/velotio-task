@@ -36,3 +36,18 @@ declare interface NormalizedObjects<T> {
   byId: { [id: string]: T };
   allIds: string[];
 }
+
+declare interface withComments {
+  comments: string[];
+}
+
+declare interface withTodos {
+  todos: string[];
+}
+
+declare interface withPosts {
+  posts: string[];
+}
+declare interface NormalizedUserObject extends User, withPosts, withTodos {}
+
+declare interface NormalizedPostObject extends Post, withComments {}

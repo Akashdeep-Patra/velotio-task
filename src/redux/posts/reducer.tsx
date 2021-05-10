@@ -1,6 +1,6 @@
 import { PostMutation } from './actionTypes';
 import { PostsActions } from './actions';
-const initialState: NormalizedObjects<Post> = {
+const initialState: NormalizedObjects<NormalizedPostObject> = {
   byId: {},
   allIds: [],
 };

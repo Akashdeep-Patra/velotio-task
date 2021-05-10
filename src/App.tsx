@@ -10,10 +10,10 @@ import { fetchUsers, fetchPosts, fetchComments, fetchTodos } from './utils';
 
 const App = () => {
   const dispatch = useDispatch();
-  const setUsersState = (users: NormalizedObjects<User>) => {
+  const setUsersState = (users: NormalizedObjects<NormalizedUserObject>) => {
     dispatch(setUsers(users));
   };
-  const setPostsState = (posts: NormalizedObjects<Post>) => {
+  const setPostsState = (posts: NormalizedObjects<NormalizedPostObject>) => {
     dispatch(setPosts(posts));
   };
   const setCommentsState = (comments: NormalizedObjects<Comment>) => {
@@ -24,18 +24,74 @@ const App = () => {
   };
 
   //function for normalizing the related data into a singular schema
-  function normalizeData<T extends DataWithId>(
-    data: T[]
-  ): NormalizedObjects<T> {
-    const normalizedData: NormalizedObjects<T> = {
+  function normalizeData(
+    users: User[],
+    comments: Comment[],
+    posts: Post[],
+    todos: Todo[]
+  ): [
+    NormalizedObjects<NormalizedUserObject>,
+    NormalizedObjects<NormalizedPostObject>,
+    NormalizedObjects<Comment>,
+    NormalizedObjects<Todo>
+  ] {
+    const normalizedUsers: NormalizedObjects<NormalizedUserObject> = {
       byId: {},
       allIds: [],
     };
-    data.forEach((item: T) => {
-      normalizedData.byId[item.id] = item;
-      normalizedData.allIds.push(item.id);
+
+    const normalizedPosts: NormalizedObjects<NormalizedPostObject> = {
+      byId: {},
+      allIds: [],
+    };
+
+    const normalizedComments: NormalizedObjects<Comment> = {
+      byId: {},
+      allIds: [],
+    };
+
+    const normalizedTodos: NormalizedObjects<Todo> = {
+      byId: {},
+      allIds: [],
+    };
+    users.forEach((item: User) => {
+      normalizedUsers.byId[item.id] = {
+        ...item,
+        posts: posts
+          .filter((post) => post.userId === item.id)
+          .map((post) => post.id),
+        todos: todos
+          .filter((todo) => todo.userId === item.id)
+          .map((todo) => todo.id),
+      };
+      normalizedUsers.allIds.push(item.id);
     });
-    return normalizedData;
+
+    posts.forEach((post) => {
+      normalizedPosts.byId[post.id] = {
+        ...post,
+        comments: comments
+          .filter((comment) => comment.postId === post.id)
+          .map((comment) => comment.id),
+      };
+      normalizedPosts.allIds.push(post.id);
+    });
+
+    comments.forEach((comment) => {
+      normalizedComments.byId[comment.id] = comment;
+      normalizedComments.allIds.push(comment.id);
+    });
+
+    todos.forEach((todo) => {
+      normalizedTodos.byId[todo.id] = todo;
+      normalizedTodos.allIds.push(todo.id);
+    });
+    return [
+      normalizedUsers,
+      normalizedPosts,
+      normalizedComments,
+      normalizedTodos,
+    ];
   }
 
   useEffect(() => {
@@ -52,11 +108,16 @@ const App = () => {
           fetchComments(),
           fetchTodos(),
         ]);
-
-        setUsersState(normalizeData(users));
-        setPostsState(normalizeData(posts));
-        setCommentsState(normalizeData(comments));
-        setTodosState(normalizeData(todos));
+        const [
+          normalizedUsers,
+          normalizedPosts,
+          normalizedComments,
+          normalizedTodos,
+        ] = normalizeData(users, comments, posts, todos);
+        setUsersState(normalizedUsers);
+        setPostsState(normalizedPosts);
+        setCommentsState(normalizedComments);
+        setTodosState(normalizedTodos);
       } catch (error) {
         console.log(error.message);
       }
