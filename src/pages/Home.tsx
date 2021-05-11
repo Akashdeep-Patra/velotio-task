@@ -10,7 +10,6 @@ import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 import Form from '../components/form';
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
@@ -44,14 +43,8 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   tab: {
-    border: '1px solid grey',
-    borderRadius: '6px',
-    width: '70%',
     margin: '1%',
-    padding: '1%',
-    '&:hover': {
-      cursor: 'pointer',
-    },
+    width: '100%',
   },
 }));
 
@@ -66,7 +59,7 @@ const Home = () => {
 
   const handleAnchorClick = (
     post: Post,
-    event: React.MouseEvent<HTMLDivElement>
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
     setSelectedPost(post);
     setAnchorEl(event.currentTarget);
@@ -107,7 +100,14 @@ const Home = () => {
       .filter((post) => post.userId === selectedUser?.id)
       .map((post) => (
         <div className={classes.tab} key={post.id}>
-          <div onClick={(e) => handleAnchorClick(post, e)}>{post.title}</div>
+          <Button
+            variant='outlined'
+            fullWidth={true}
+            color='primary'
+            onClick={(e) => handleAnchorClick(post, e)}
+          >
+            {post.title}
+          </Button>
           {selectedPost?.id === post.id && (
             <Menu
               id='simple-menu'
